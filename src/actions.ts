@@ -1,6 +1,6 @@
 import {Area} from '@workadventure/iframe-api-typings/iframe_api.js';
 
-import {ActionButtonId, AreaName, CustomerCallAreaNames, PauseAreaNames, TeleportResetAreaNames,} from './actions.constants.js';
+import {ActionButtonId, AreaName, CustomerCallAreaNames, PauseAreaNames,} from './actions.constants.js';
 import {assetUrl, getNearestAreaByName, getRandomInt} from './actions.helpers.js';
 
 const tileSize = 32;
@@ -22,22 +22,29 @@ const positions: Record<PositionType, Position> = {
   [PositionType.LastPositionMeeting]: {x: undefined, y: undefined},
 };
 
-function clearLastPositions() {
-  for (let position of Object.values(positions)) {
-    position.x = undefined;
-    position.y = undefined;
-  }
+function clearLastPosition(positionType: PositionType) {
+  Object.assign(positions[positionType], {x: undefined, y: undefined});
 }
 
 function registerAreaOnLeaveHandler() {
-  for (const areaName of TeleportResetAreaNames) {
+  for (const areaName of PauseAreaNames) {
     WA.room.area.onLeave(areaName).subscribe(() => {
-      clearLastPositions();
+      clearLastPosition(PositionType.LastPositionBreak);
     });
   }
+
+  for (const areaName of CustomerCallAreaNames) {
+    WA.room.area.onLeave(areaName).subscribe(() => {
+      clearLastPosition(PositionType.LastPositionCall);
+    });
+  }
+
+  WA.room.area.onLeave(AreaName.Meeting).subscribe(() => {
+    clearLastPosition(PositionType.LastPositionMeeting);
+  });
 }
 
-function addTeleportButton(
+function addWalkButton(
     id: string, imageSrc: string, toolTip: string, positionType: PositionType,
     getArea: () => Promise<Area|undefined>) {
   WA.ui.actionBar.addButton({
@@ -52,12 +59,12 @@ function addTeleportButton(
         area = await getArea();
       }
 
-      teleportPlayerToArea(area, positionType);
+      await walkPlayerToArea(area, positionType);
     }
   });
 }
 
-async function teleportPlayerToArea(
+async function walkPlayerToArea(
     area: Area|undefined, positionType: PositionType) {
   let x = positions[positionType].x;
   let y = positions[positionType].y;
@@ -81,7 +88,13 @@ async function teleportPlayerToArea(
   }
 
   if (x !== undefined && y !== undefined) {
-    WA.player.moveTo(x, y, 20);
+    const moveResult = await WA.player.moveTo(x, y, 20);
+
+    // Fallback: if movement is interrupted, area leave events may not run as
+    // expected.
+    if (moveResult.cancelled && area === undefined) {
+      clearLastPosition(positionType);
+    }
   }
 
   removeButtons();
@@ -89,7 +102,7 @@ async function teleportPlayerToArea(
 }
 
 function addPauseButton() {
-  addTeleportButton(
+  addWalkButton(
       ActionButtonId.Pause, assetUrl('ds/pause.png'),
       'Zum Pausenbereich teleportieren und zurück',
       PositionType.LastPositionBreak,
@@ -97,7 +110,7 @@ function addPauseButton() {
 }
 
 function addCustomerCallButton() {
-  addTeleportButton(
+  addWalkButton(
       ActionButtonId.CustomerCall, assetUrl('ds/call.png'),
       'Zum \'Im Gespräch\'-Bereich teleportieren und zurück',
       PositionType.LastPositionCall,
@@ -105,7 +118,7 @@ function addCustomerCallButton() {
 }
 
 function addMeetingButton() {
-  addTeleportButton(
+  addWalkButton(
       ActionButtonId.Meeting, assetUrl('ds/meeting.png'),
       'Zum Meeting-Bereich teleportieren und zurück',
       PositionType.LastPositionMeeting,

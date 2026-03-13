@@ -16,5 +16,3 @@ export const AreaName = {
 export const PauseAreaNames = [AreaName.Pause1, AreaName.Pause2] as const;
 export const CustomerCallAreaNames =
     [AreaName.CustomerCall1, AreaName.CustomerCall2] as const;
-export const TeleportResetAreaNames =
-    [...PauseAreaNames, ...CustomerCallAreaNames, AreaName.Meeting] as const;
