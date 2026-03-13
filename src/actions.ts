@@ -93,10 +93,6 @@ async function walkPlayerToArea(
     let temporarySpace;
     const temporarySpaceName = `auto-walk-${WA.player.playerId}-${Date.now()}`;
 
-    WA.controls.disablePlayerProximityMeeting();
-    WA.controls.disableMicrophone();
-    WA.controls.disableWebcam();
-
     let moveResult;
     try {
       temporarySpace =
@@ -110,10 +106,6 @@ async function walkPlayerToArea(
       } catch (e) {
         console.warn('Could not leave temporary auto-walk space:', e);
       }
-
-      WA.controls.restoreWebcam();
-      WA.controls.restoreMicrophone();
-      WA.controls.restorePlayerProximityMeeting();
     }
 
     // Fallback: if movement is interrupted, area leave events may not run as
