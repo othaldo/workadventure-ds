@@ -88,14 +88,31 @@ async function walkPlayerToArea(
   }
 
   if (x !== undefined && y !== undefined) {
-    // Prevent joining proximity/livekit calls while auto-walking through call
-    // areas. This is restored in finally, including on cancel/error.
+    // Best-effort guard for auto-walk: temporarily isolate in a dedicated
+    // space and disable local media/proximity controls while moving.
+    let temporarySpace;
+    const temporarySpaceName = `auto-walk-${WA.player.playerId}-${Date.now()}`;
+
     WA.controls.disablePlayerProximityMeeting();
+    WA.controls.disableMicrophone();
+    WA.controls.disableWebcam();
 
     let moveResult;
     try {
+      temporarySpace =
+          await WA.spaces.joinSpace(temporarySpaceName, 'everyone', []);
       moveResult = await WA.player.moveTo(x, y, 20);
+    } catch (e) {
+      console.warn('Temporary space guard failed during auto-walk:', e);
     } finally {
+      try {
+        temporarySpace?.leave();
+      } catch (e) {
+        console.warn('Could not leave temporary auto-walk space:', e);
+      }
+
+      WA.controls.restoreWebcam();
+      WA.controls.restoreMicrophone();
       WA.controls.restorePlayerProximityMeeting();
     }
 
