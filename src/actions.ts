@@ -88,25 +88,7 @@ async function walkPlayerToArea(
   }
 
   if (x !== undefined && y !== undefined) {
-    // Best-effort guard for auto-walk: temporarily isolate in a dedicated
-    // space and disable local media/proximity controls while moving.
-    let temporarySpace;
-    const temporarySpaceName = `auto-walk-${WA.player.playerId}-${Date.now()}`;
-
-    let moveResult;
-    try {
-      temporarySpace =
-          await WA.spaces.joinSpace(temporarySpaceName, 'everyone', []);
-      moveResult = await WA.player.moveTo(x, y, 20);
-    } catch (e) {
-      console.warn('Temporary space guard failed during auto-walk:', e);
-    } finally {
-      try {
-        temporarySpace?.leave();
-      } catch (e) {
-        console.warn('Could not leave temporary auto-walk space:', e);
-      }
-    }
+    let moveResult = await WA.player.moveTo(x, y, 20);
 
     // Fallback: if movement is interrupted, area leave events may not run as
     // expected.
