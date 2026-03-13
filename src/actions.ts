@@ -88,11 +88,20 @@ async function walkPlayerToArea(
   }
 
   if (x !== undefined && y !== undefined) {
-    const moveResult = await WA.player.moveTo(x, y, 20);
+    // Prevent joining proximity/livekit calls while auto-walking through call
+    // areas. This is restored in finally, including on cancel/error.
+    WA.controls.disablePlayerProximityMeeting();
+
+    let moveResult;
+    try {
+      moveResult = await WA.player.moveTo(x, y, 20);
+    } finally {
+      WA.controls.restorePlayerProximityMeeting();
+    }
 
     // Fallback: if movement is interrupted, area leave events may not run as
     // expected.
-    if (moveResult.cancelled && area === undefined) {
+    if (moveResult?.cancelled && area === undefined) {
       clearLastPosition(positionType);
     }
   }
