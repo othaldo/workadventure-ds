@@ -8,7 +8,7 @@ const tileSize = 32;
 enum PositionType {
   LastPositionBreak,
   LastPositionCall,
-  LastPositionPool,
+  LastPositionMeeting,
 }
 
 interface Position {
@@ -19,7 +19,7 @@ interface Position {
 const positions: Record<PositionType, Position> = {
   [PositionType.LastPositionBreak]: {x: undefined, y: undefined},
   [PositionType.LastPositionCall]: {x: undefined, y: undefined},
-  [PositionType.LastPositionPool]: {x: undefined, y: undefined},
+  [PositionType.LastPositionMeeting]: {x: undefined, y: undefined},
 };
 
 function clearLastPositions() {
@@ -81,7 +81,7 @@ async function teleportPlayerToArea(
   }
 
   if (x !== undefined && y !== undefined) {
-    WA.player.teleport(x, y);
+    WA.player.moveTo(x, y, 20);
   }
 
   removeButtons();
@@ -104,24 +104,24 @@ function addCustomerCallButton() {
       async () => await getNearestAreaByName([...CustomerCallAreaNames]));
 }
 
-function addPoolButton() {
+function addMeetingButton() {
   addTeleportButton(
-      ActionButtonId.Pool, assetUrl('ds/pool.png'),
-      'Zum Pool-Bereich teleportieren und zurück',
-      PositionType.LastPositionPool,
-      async () => await WA.room.area.get(AreaName.Pool));
+      ActionButtonId.Meeting, assetUrl('ds/meeting.png'),
+      'Zum Meeting-Bereich teleportieren und zurück',
+      PositionType.LastPositionMeeting,
+      async () => await WA.room.area.get(AreaName.Meeting));
 }
 
 function addActionButtons() {
   addPauseButton();
   addCustomerCallButton();
-  addPoolButton();
+  addMeetingButton();
 }
 
 function removeButtons() {
   WA.ui.actionBar.removeButton(ActionButtonId.Pause);
   WA.ui.actionBar.removeButton(ActionButtonId.CustomerCall);
-  WA.ui.actionBar.removeButton(ActionButtonId.Pool);
+  WA.ui.actionBar.removeButton(ActionButtonId.Meeting);
 }
 
 export class Actions {
