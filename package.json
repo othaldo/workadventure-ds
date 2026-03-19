@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node scripts/fix-wa-script-wrappers.mjs",
     "prod": "vite preview",
     "clean": "rm -rf dist",
     "rebuild": "npm run clean && npm run build"
