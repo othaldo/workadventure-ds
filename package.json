@@ -7,15 +7,18 @@
     "dev": "vite",
     "start": "vite",
     "build": "tsc && vite build",
-    "prod": "vite preview"
+    "prod": "vite preview",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@workadventure/iframe-api-typings": "^1.28.9",
     "dotenv": "^17.2.3",
     "typescript": "^5.9.3",
-    "vite": "^4.5.3",
-    "wa-map-optimizer-vite": "1.1.31"
+    "vite": "^7.3.1",
+    "vite-plugin-node": "^7.0.0",
+    "wa-map-optimizer-vite": "^1.2.4"
   },
   "dependencies": {
     "@types/suncalc": "^1.9.2",
