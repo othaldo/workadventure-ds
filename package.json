@@ -9,7 +9,9 @@
     "build": "tsc && vite build && node scripts/fix-wa-script-wrappers.mjs",
     "prod": "vite preview",
     "clean": "rm -rf dist",
-    "rebuild": "npm run clean && npm run build"
+    "rebuild": "npm run clean && npm run build",
+    "serve:dist": "npx --yes serve dist -l 4173 -C --no-etag --no-port-switching",
+    "tunnel:dist": "npx --yes localtunnel --port 4173"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
