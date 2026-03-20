@@ -8,8 +8,8 @@ WA.onInit()
     .then(() => {
       const userTag = WA.player.tags;
 
-      Actions.registerActions();
       if (userTag.includes('member')) {
+        Actions.registerActions();
         WA.player.setOutlineColor(68, 153, 169);
       }
       Holidays.init();
