@@ -18,6 +18,25 @@ export function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export function sanitizeMoveSpeed(
+    speed: number, defaultMoveSpeed: number): number {
+  if (!Number.isFinite(speed)) {
+    return defaultMoveSpeed;
+  }
+
+  return Math.min(60, Math.max(5, Math.round(speed)));
+}
+
+export function buildTravelToolTip(
+    baseToolTip: string, teleportModeEnabled: boolean,
+    moveSpeed: number): string {
+  if (!teleportModeEnabled) {
+    return `${baseToolTip} (Alt+T: Teleport-Modus, Speed: ${moveSpeed})`;
+  }
+
+  return `${baseToolTip} (Teleport aktiv, Alt+T, Speed: ${moveSpeed})`;
+}
+
 export function getDistance(x1: number, y1: number, x2: number, y2: number) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }

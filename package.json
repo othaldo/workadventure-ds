@@ -6,21 +6,26 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "tsc && vite build",
-    "prod": "vite preview"
+    "build": "tsc && vite build && node scripts/fix-wa-script-wrappers.mjs",
+    "prod": "vite preview",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "serve:dist": "npx --yes serve dist -l 4173 -C --no-etag --no-port-switching",
+    "tunnel:dist": "npx --yes localtunnel --port 4173"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@workadventure/iframe-api-typings": "^1.27.2",
+    "@workadventure/iframe-api-typings": "^1.28.9",
     "dotenv": "^17.2.3",
     "typescript": "^5.9.3",
-    "vite": "^4.5.3",
-    "wa-map-optimizer-vite": "^1.1.31"
+    "vite": "^7.3.0",
+    "vite-plugin-node": "^7.0.0",
+    "wa-map-optimizer-vite": "^1.2.4"
   },
   "dependencies": {
-    "@workadventure/scripting-api-extra": "^1.9.10",
+    "@types/suncalc": "^1.9.2",
+    "@workadventure/scripting-api-extra": "^1.9.12",
     "cron-schedule": "^5.0.4",
-    "suncalc": "^1.x.x",
-    "@types/suncalc": "^1.9.2"
+    "suncalc": "^1.x.x"
   }
 }

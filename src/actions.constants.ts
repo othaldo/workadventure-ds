@@ -1,7 +1,7 @@
 export const ActionButtonId = {
   Pause: 'pause-btn',
   CustomerCall: 'customer-call-btn',
-  Pool: 'pool-btn',
+  Meeting: 'meeting-btn',
 } as const;
 
 export const AreaName = {
@@ -10,10 +10,13 @@ export const AreaName = {
   CustomerCall1: 'ccArea1',
   CustomerCall2: 'ccArea2',
   Pool: 'poolArea',
+  Meeting: 'meetingArea',
 } as const;
 
 export const PauseAreaNames = [AreaName.Pause1, AreaName.Pause2] as const;
 export const CustomerCallAreaNames =
     [AreaName.CustomerCall1, AreaName.CustomerCall2] as const;
-export const TeleportResetAreaNames =
-    [...PauseAreaNames, ...CustomerCallAreaNames, AreaName.Pool] as const;
+
+export const DefaultMoveSpeed = 20;
+export const TeleportModeStateKey = 'travelTeleportModeEnabled';
+export const MoveSpeedStateKey = 'travelMoveSpeed';
