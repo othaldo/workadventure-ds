@@ -18,6 +18,65 @@ export function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+interface PositionLike {
+  x: number|undefined;
+  y: number|undefined;
+}
+
+interface ActionSettingsLike {
+  teleportModeEnabled: boolean;
+  moveSpeed: number;
+}
+
+export function clearLastPositionInState<K extends string|number>(
+    positions: Record<K, PositionLike>, positionType: K) {
+  Object.assign(positions[positionType], {x: undefined, y: undefined});
+}
+
+export function setTeleportModeEnabledInState(
+    actionSettings: ActionSettingsLike, enabled: boolean): boolean {
+  if (actionSettings.teleportModeEnabled === enabled) {
+    return false;
+  }
+
+  actionSettings.teleportModeEnabled = enabled;
+  return true;
+}
+
+export function setMoveSpeedInState(
+    actionSettings: ActionSettingsLike, speed: number,
+    defaultMoveSpeed: number): boolean {
+  const nextSpeed = sanitizeMoveSpeed(speed, defaultMoveSpeed);
+  if (actionSettings.moveSpeed === nextSpeed) {
+    return false;
+  }
+
+  actionSettings.moveSpeed = nextSpeed;
+  return true;
+}
+
+export function setActionVisibilityInState<K extends string>(
+    actionVisibility: Record<K, boolean>, buttonId: K,
+    enabled: boolean): boolean {
+  if (actionVisibility[buttonId] === enabled) {
+    return false;
+  }
+
+  actionVisibility[buttonId] = enabled;
+  return true;
+}
+
+export function addTravelActionButton(
+    id: string, imageSrc: string, toolTip: string,
+    callback: () => Promise<void>| void) {
+  WA.ui.actionBar.addButton({
+    id,
+    imageSrc,
+    toolTip,
+    callback,
+  });
+}
+
 export function sanitizeMoveSpeed(
     speed: number, defaultMoveSpeed: number): number {
   if (!Number.isFinite(speed)) {
