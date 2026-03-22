@@ -10,7 +10,9 @@ WA.onInit()
 
       if (userTag.includes('member')) {
         Actions.registerActions();
-        WA.player.setOutlineColor(68, 153, 169);
+        // WA.player.setOutlineColor(68, 153, 169);
+        // Eventuell hat das setzen der Outline-Farbe Performanceauswirkungen
+        // ... Warum auch immer?!
       }
       Holidays.init();
       Night.init();
