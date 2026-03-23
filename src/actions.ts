@@ -245,9 +245,11 @@ function addTravelButton(
         const position = positions[positionType];
         const useTeleport = actionSettings.teleportModeEnabled;
         let area;
+        const hasReturnPosition =
+            position.x !== undefined && position.y !== undefined;
 
-        if (useTeleport || position.x === undefined ||
-            position.y === undefined) {
+        // Resolve the target area only when we are not already able to return.
+        if (!hasReturnPosition) {
           area = await getArea();
         }
 
