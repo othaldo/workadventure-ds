@@ -1,7 +1,7 @@
 import {Area} from '@workadventure/iframe-api-typings/iframe_api.js';
 
-import {ActionButtonId, AreaName, CustomerCallAreaNames, DefaultMoveSpeed, MoveSpeedStateKey, PauseAreaNames, TeleportModeStateKey,} from './actions.constants.js';
-import {assetUrl, buildTravelToolTip, getNearestAreaByName, getRandomInt, sanitizeMoveSpeed,} from './actions.helpers.js';
+import {ActionButtonId, ActionVisibilityStateKey, AreaName, CustomerCallAreaNames, DefaultMoveSpeed, MoveSpeedStateKey, PauseAreaNames, TeleportModeStateKey,} from './actions.constants.js';
+import {addTravelActionButton, assetUrl, buildTravelToolTip, clearLastPositionInState, getNearestAreaByName, getRandomInt, setActionVisibilityInState, setMoveSpeedInState, setTeleportModeEnabledInState,} from './actions.helpers.js';
 import {registerActionSettingsMenu} from './actionSettings.js';
 
 const tileSize = 32;
@@ -11,10 +11,24 @@ const actionSettings = {
   moveSpeed: DefaultMoveSpeed,
 };
 
+const actionVisibility = {
+  [ActionButtonId.Pause]: true,
+  [ActionButtonId.CustomerCall]: true,
+  [ActionButtonId.Meeting]: true,
+  [ActionButtonId.Emergency]: false,
+  [ActionButtonId.Greenhouse]: false,
+  [ActionButtonId.Lounge]: false,
+  [ActionButtonId.Pool]: false,
+};
+
 enum PositionType {
   LastPositionBreak,
   LastPositionCall,
   LastPositionMeeting,
+  LastPositionEmergency,
+  LastPositionGreenhouse,
+  LastPositionLounge,
+  LastPositionPool,
 }
 
 interface Position {
@@ -26,33 +40,45 @@ const positions: Record<PositionType, Position> = {
   [PositionType.LastPositionBreak]: {x: undefined, y: undefined},
   [PositionType.LastPositionCall]: {x: undefined, y: undefined},
   [PositionType.LastPositionMeeting]: {x: undefined, y: undefined},
+  [PositionType.LastPositionEmergency]: {x: undefined, y: undefined},
+  [PositionType.LastPositionGreenhouse]: {x: undefined, y: undefined},
+  [PositionType.LastPositionLounge]: {x: undefined, y: undefined},
+  [PositionType.LastPositionPool]: {x: undefined, y: undefined},
 };
 
 function clearLastPosition(positionType: PositionType) {
-  Object.assign(positions[positionType], {x: undefined, y: undefined});
+  clearLastPositionInState(positions, positionType);
 }
 
 function setTeleportModeEnabled(enabled: boolean) {
-  if (actionSettings.teleportModeEnabled === enabled) {
+  const changed = setTeleportModeEnabledInState(actionSettings, enabled);
+  if (!changed) {
     return;
   }
-
-  actionSettings.teleportModeEnabled = enabled;
-
-  removeButtons();
-  addActionButtons();
 }
 
 function setMoveSpeed(speed: number) {
-  const nextSpeed = sanitizeMoveSpeed(speed, DefaultMoveSpeed);
-  if (actionSettings.moveSpeed === nextSpeed) {
+  const changed = setMoveSpeedInState(actionSettings, speed, DefaultMoveSpeed);
+  if (!changed) {
+    return;
+  }
+}
+
+function setActionVisibility(
+    buttonId: keyof typeof actionVisibility, enabled: boolean) {
+  const changed =
+      setActionVisibilityInState(actionVisibility, buttonId, enabled);
+  if (!changed) {
     return;
   }
 
-  actionSettings.moveSpeed = nextSpeed;
+  if (!enabled) {
+    removeActionButton(buttonId);
+    return;
+  }
 
-  removeButtons();
-  addActionButtons();
+  // Rebuild all buttons only when adding one to keep a stable order.
+  refreshActionButtons();
 }
 
 function loadActionSettingsFromState() {
@@ -64,6 +90,49 @@ function loadActionSettingsFromState() {
   const savedMoveSpeed = WA.player.state.loadVariable(MoveSpeedStateKey);
   if (typeof savedMoveSpeed === 'number') {
     setMoveSpeed(savedMoveSpeed);
+  }
+
+  const savedPauseVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.Pause);
+  if (typeof savedPauseVisibility === 'boolean') {
+    setActionVisibility(ActionButtonId.Pause, savedPauseVisibility);
+  }
+
+  const savedCustomerCallVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.CustomerCall);
+  if (typeof savedCustomerCallVisibility === 'boolean') {
+    setActionVisibility(
+        ActionButtonId.CustomerCall, savedCustomerCallVisibility);
+  }
+
+  const savedMeetingVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.Meeting);
+  if (typeof savedMeetingVisibility === 'boolean') {
+    setActionVisibility(ActionButtonId.Meeting, savedMeetingVisibility);
+  }
+
+  const savedEmergencyVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.Emergency);
+  if (typeof savedEmergencyVisibility === 'boolean') {
+    setActionVisibility(ActionButtonId.Emergency, savedEmergencyVisibility);
+  }
+
+  const savedGreenhouseVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.Greenhouse);
+  if (typeof savedGreenhouseVisibility === 'boolean') {
+    setActionVisibility(ActionButtonId.Greenhouse, savedGreenhouseVisibility);
+  }
+
+  const savedLoungeVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.Lounge);
+  if (typeof savedLoungeVisibility === 'boolean') {
+    setActionVisibility(ActionButtonId.Lounge, savedLoungeVisibility);
+  }
+
+  const savedPoolVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.Pool);
+  if (typeof savedPoolVisibility === 'boolean') {
+    setActionVisibility(ActionButtonId.Pool, savedPoolVisibility);
   }
 }
 
@@ -79,6 +148,55 @@ function registerActionSettingsStateSync() {
       setMoveSpeed(value);
     }
   });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.Pause)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.Pause, value);
+        }
+      });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.CustomerCall)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.CustomerCall, value);
+        }
+      });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.Meeting)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.Meeting, value);
+        }
+      });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.Emergency)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.Emergency, value);
+        }
+      });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.Greenhouse)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.Greenhouse, value);
+        }
+      });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.Lounge)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.Lounge, value);
+        }
+      });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.Pool)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.Pool, value);
+        }
+      });
 }
 
 function registerAreaOnLeaveHandler() {
@@ -97,28 +215,46 @@ function registerAreaOnLeaveHandler() {
   WA.room.area.onLeave(AreaName.Meeting).subscribe(() => {
     clearLastPosition(PositionType.LastPositionMeeting);
   });
+
+  WA.room.area.onLeave(AreaName.Emergency).subscribe(() => {
+    clearLastPosition(PositionType.LastPositionEmergency);
+  });
+
+  WA.room.area.onLeave(AreaName.Greenhouse).subscribe(() => {
+    clearLastPosition(PositionType.LastPositionGreenhouse);
+  });
+
+  WA.room.area.onLeave(AreaName.Lounge).subscribe(() => {
+    clearLastPosition(PositionType.LastPositionLounge);
+  });
+
+  WA.room.area.onLeave(AreaName.Pool).subscribe(() => {
+    clearLastPosition(PositionType.LastPositionPool);
+  });
 }
 
 function addTravelButton(
     id: string, imageSrc: string, toolTip: string, positionType: PositionType,
     getArea: () => Promise<Area|undefined>) {
-  WA.ui.actionBar.addButton({
-    id,
-    imageSrc,
-    toolTip: buildTravelToolTip(
-        toolTip, actionSettings.teleportModeEnabled, actionSettings.moveSpeed),
-    callback: async () => {
-      const position = positions[positionType];
-      const useTeleport = actionSettings.teleportModeEnabled;
-      let area;
+  addTravelActionButton(
+      id, imageSrc,
+      buildTravelToolTip(
+          toolTip, actionSettings.teleportModeEnabled,
+          actionSettings.moveSpeed),
+      async () => {
+        const position = positions[positionType];
+        const useTeleport = actionSettings.teleportModeEnabled;
+        let area;
+        const hasReturnPosition =
+            position.x !== undefined && position.y !== undefined;
 
-      if (useTeleport || position.x === undefined || position.y === undefined) {
-        area = await getArea();
-      }
+        // Resolve the target area only when we are not already able to return.
+        if (!hasReturnPosition) {
+          area = await getArea();
+        }
 
-      await travelPlayerToArea(area, positionType, useTeleport);
-    }
-  });
+        await travelPlayerToArea(area, positionType, useTeleport);
+      });
 }
 
 async function travelPlayerToArea(
@@ -157,45 +293,78 @@ async function travelPlayerToArea(
       }
     }
   }
-
-  removeButtons();
-  addActionButtons();
-}
-
-function addPauseButton() {
-  addTravelButton(
-      ActionButtonId.Pause, assetUrl('ds/pause.png'),
-      'Zum Pausenbereich teleportieren und zurück',
-      PositionType.LastPositionBreak,
-      async () => await getNearestAreaByName([...PauseAreaNames]));
-}
-
-function addCustomerCallButton() {
-  addTravelButton(
-      ActionButtonId.CustomerCall, assetUrl('ds/call.png'),
-      'Zum \'Im Gespräch\'-Bereich teleportieren und zurück',
-      PositionType.LastPositionCall,
-      async () => await getNearestAreaByName([...CustomerCallAreaNames]));
-}
-
-function addMeetingButton() {
-  addTravelButton(
-      ActionButtonId.Meeting, assetUrl('ds/meeting.png'),
-      'Zum Meeting-Bereich teleportieren und zurück',
-      PositionType.LastPositionMeeting,
-      async () => await WA.room.area.get(AreaName.Meeting));
 }
 
 function addActionButtons() {
-  addPauseButton();
-  addCustomerCallButton();
-  addMeetingButton();
+  if (actionVisibility[ActionButtonId.Pause]) {
+    addTravelButton(
+        ActionButtonId.Pause, assetUrl('ds/pause.png'),
+        'Zum Pausenbereich teleportieren und zurück',
+        PositionType.LastPositionBreak,
+        async () => await getNearestAreaByName([...PauseAreaNames]));
+  }
+
+  if (actionVisibility[ActionButtonId.CustomerCall]) {
+    addTravelButton(
+        ActionButtonId.CustomerCall, assetUrl('ds/call.png'),
+        'Zum \'Im Gespräch\'-Bereich teleportieren und zurück',
+        PositionType.LastPositionCall,
+        async () => await getNearestAreaByName([...CustomerCallAreaNames]));
+  }
+
+  if (actionVisibility[ActionButtonId.Meeting]) {
+    addTravelButton(
+        ActionButtonId.Meeting, assetUrl('ds/meeting.png'),
+        'Zum Meeting-Bereich teleportieren und zurück',
+        PositionType.LastPositionMeeting,
+        async () => await WA.room.area.get(AreaName.Meeting));
+  }
+
+  if (actionVisibility[ActionButtonId.Emergency]) {
+    addTravelButton(
+        ActionButtonId.Emergency, assetUrl('ds/emergency.png'),
+        'Zum Emergency-Bereich teleportieren und zurück',
+        PositionType.LastPositionEmergency,
+        async () => await WA.room.area.get(AreaName.Emergency));
+  }
+
+  if (actionVisibility[ActionButtonId.Greenhouse]) {
+    addTravelButton(
+        ActionButtonId.Greenhouse, assetUrl('ds/greenhouse.png'),
+        'Zum Gewächshaus-Bereich teleportieren und zurück',
+        PositionType.LastPositionGreenhouse,
+        async () => await WA.room.area.get(AreaName.Greenhouse));
+  }
+
+  if (actionVisibility[ActionButtonId.Lounge]) {
+    addTravelButton(
+        ActionButtonId.Lounge, assetUrl('ds/lounge.png'),
+        'Zur Lounge teleportieren und zurück', PositionType.LastPositionLounge,
+        async () => await WA.room.area.get(AreaName.Lounge));
+  }
+
+  if (actionVisibility[ActionButtonId.Pool]) {
+    addTravelButton(
+        ActionButtonId.Pool, assetUrl('ds/pool.png'),
+        'Zum Pool-Bereich teleportieren und zurück',
+        PositionType.LastPositionPool,
+        async () => await WA.room.area.get(AreaName.Pool));
+  }
 }
 
-function removeButtons() {
+function removeActionButton(buttonId: string) {
+  WA.ui.actionBar.removeButton(buttonId);
+}
+
+function refreshActionButtons() {
   WA.ui.actionBar.removeButton(ActionButtonId.Pause);
   WA.ui.actionBar.removeButton(ActionButtonId.CustomerCall);
   WA.ui.actionBar.removeButton(ActionButtonId.Meeting);
+  WA.ui.actionBar.removeButton(ActionButtonId.Emergency);
+  WA.ui.actionBar.removeButton(ActionButtonId.Greenhouse);
+  WA.ui.actionBar.removeButton(ActionButtonId.Lounge);
+  WA.ui.actionBar.removeButton(ActionButtonId.Pool);
+  addActionButtons();
 }
 
 export class Actions {

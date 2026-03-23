@@ -5425,7 +5425,7 @@
                  "rotation":0,
                  "type":"area",
                  "visible":true,
-                 "width":176,
+                 "width":288.5,
                  "x":1181.86666666667,
                  "y":1314.13333333333
                 }, 
@@ -5622,29 +5622,55 @@
                  "y":1023.49831093604
                 }, 
                 {
-                 "height":238,
+                 "height":182,
                  "id":90,
                  "name":"gewaechshausArea",
                  "opacity":1,
                  "rotation":0,
                  "type":"area",
                  "visible":true,
-                 "width":300,
-                 "x":1641,
-                 "y":1600
+                 "width":286,
+                 "x":1648,
+                 "y":1603
+                }, 
+                {
+                 "height":224,
+                 "id":91,
+                 "name":"emergencyArea",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"area",
+                 "visible":true,
+                 "width":352,
+                 "x":1504,
+                 "y":384
                 }, 
                 {
                  "height":248,
-                 "id":91,
+                 "id":101,
                  "name":"meetingArea",
                  "opacity":1,
                  "rotation":0,
                  "type":"area",
                  "visible":true,
                  "width":382,
-                 "x":1088,
-                 "y":484
+                 "x":1096,
+                 "y":492
+                }, 
+                {
+                 "height":192,
+                 "id":102,
+                 "name":"poolArea",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"area",
+                 "visible":true,
+                 "width":260,
+                 "x":64,
+                 "y":1504
                 }],
+         "offsetx":0.00694444444444442,
+         "offsety":0.00277777777777777,
          "opacity":1,
          "type":"objectgroup",
          "visible":false,
@@ -8044,8 +8070,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":251,
- "nextobjectid":100,
+ "nextlayerid":252,
+ "nextobjectid":103,
  "orientation":"orthogonal",
  "properties":[
         {
@@ -8084,7 +8110,7 @@
          "value":false
         }],
  "renderorder":"right-down",
- "tiledversion":"1.12.0-4-gd12c9977e",
+ "tiledversion":"1.12.0-1-gd3530f437",
  "tileheight":32,
  "tilesets":[
         {

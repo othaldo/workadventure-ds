@@ -8,6 +8,17 @@ WA.onInit()
     .then(() => {
       const userTag = WA.player.tags;
 
+      if (!WA.player.isLogged) {
+        WA.ui.banner.openBanner({
+          id: 'guest-access-info',
+          text:
+              'Du bist aktuell nicht eingeloggt. Bestimmte Bereiche sind nur für Mitglieder zugänglich.',
+          bgColor: '#fa091e',
+          textColor: '#ffe2d8',
+          closable: false,
+        });
+      }
+
       if (userTag.includes('member')) {
         Actions.registerActions();
         // WA.player.setOutlineColor(68, 153, 169);

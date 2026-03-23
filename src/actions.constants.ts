@@ -2,6 +2,10 @@ export const ActionButtonId = {
   Pause: 'pause-btn',
   CustomerCall: 'customer-call-btn',
   Meeting: 'meeting-btn',
+  Emergency: 'emergency-btn',
+  Greenhouse: 'greenhouse-btn',
+  Lounge: 'lounge-btn',
+  Pool: 'pool-btn',
 } as const;
 
 export const AreaName = {
@@ -9,6 +13,9 @@ export const AreaName = {
   Pause2: 'pauseArea2',
   CustomerCall1: 'ccArea1',
   CustomerCall2: 'ccArea2',
+  Emergency: 'emergencyArea',
+  Greenhouse: 'gewaechshausArea',
+  Lounge: 'loungeArea',
   Pool: 'poolArea',
   Meeting: 'meetingArea',
 } as const;
@@ -20,3 +27,13 @@ export const CustomerCallAreaNames =
 export const DefaultMoveSpeed = 20;
 export const TeleportModeStateKey = 'travelTeleportModeEnabled';
 export const MoveSpeedStateKey = 'travelMoveSpeed';
+
+export const ActionVisibilityStateKey = {
+  Pause: 'actionVisiblePause',
+  CustomerCall: 'actionVisibleCustomerCall',
+  Meeting: 'actionVisibleMeeting',
+  Emergency: 'actionVisibleEmergency',
+  Greenhouse: 'actionVisibleGreenhouse',
+  Lounge: 'actionVisibleLounge',
+  Pool: 'actionVisiblePool',
+} as const;
