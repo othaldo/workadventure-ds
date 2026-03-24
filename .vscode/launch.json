@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "WA: Start Dist (Build + Tunnel)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run start:dist",
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "[Yy]our url is:\\s+(https?://\\S+)",
+                "uriFormat": "%s"
+            }
+        },
+        {
+            "name": "WA: Start Live (Auto-Update + Tunnel)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run start:live",
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "[Yy]our url is:\\s+(https?://\\S+)",
+                "uriFormat": "%s"
+            }
+        }
+    ]
+}
