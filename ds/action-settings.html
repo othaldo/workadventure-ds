@@ -630,7 +630,7 @@
         if (!Number.isFinite(value)) {
           return 20;
         }
-        return Math.min(60, Math.max(5, Math.round(value)));
+        return Math.min(100, Math.max(1, Math.round(value)));
       }
 
       function syncSpeedUI(value) {
