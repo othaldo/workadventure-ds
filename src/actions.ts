@@ -242,18 +242,23 @@ function addTravelButton(
           toolTip, actionSettings.teleportModeEnabled,
           actionSettings.moveSpeed),
       async () => {
-        const position = positions[positionType];
-        const useTeleport = actionSettings.teleportModeEnabled;
-        let area;
-        const hasReturnPosition =
-            position.x !== undefined && position.y !== undefined;
+        try {
+          const position = positions[positionType];
+          const useTeleport = actionSettings.teleportModeEnabled;
+          let area;
+          const hasReturnPosition =
+              position.x !== undefined && position.y !== undefined;
 
-        // Resolve the target area only when we are not already able to return.
-        if (!hasReturnPosition) {
-          area = await getArea();
+          // Resolve the target area only when we are not already able to
+          // return.
+          if (!hasReturnPosition) {
+            area = await getArea();
+          }
+
+          await travelPlayerToArea(area, positionType, useTeleport);
+        } finally {
+          refreshActionButtons();
         }
-
-        await travelPlayerToArea(area, positionType, useTeleport);
       });
 }
 
