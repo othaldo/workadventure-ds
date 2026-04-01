@@ -5668,6 +5668,18 @@
                  "width":260,
                  "x":64,
                  "y":1504
+                }, 
+                {
+                 "height":288,
+                 "id":103,
+                 "name":"classRoomArea",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"area",
+                 "visible":true,
+                 "width":320,
+                 "x":2624,
+                 "y":1600
                 }],
          "offsetx":0.00694444444444442,
          "offsety":0.00277777777777777,
@@ -8071,7 +8083,7 @@
          "y":0
         }],
  "nextlayerid":252,
- "nextobjectid":103,
+ "nextobjectid":104,
  "orientation":"orthogonal",
  "properties":[
         {
@@ -8110,7 +8122,7 @@
          "value":false
         }],
  "renderorder":"right-down",
- "tiledversion":"1.12.0-1-gd3530f437",
+ "tiledversion":"1.12.1-8-g449813058",
  "tileheight":32,
  "tilesets":[
         {

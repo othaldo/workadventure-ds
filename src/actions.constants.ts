@@ -6,6 +6,7 @@ export const ActionButtonId = {
   Greenhouse: 'greenhouse-btn',
   Lounge: 'lounge-btn',
   Pool: 'pool-btn',
+  ClassRoom: 'classroom-btn',
 } as const;
 
 export const AreaName = {
@@ -18,6 +19,7 @@ export const AreaName = {
   Lounge: 'loungeArea',
   Pool: 'poolArea',
   Meeting: 'meetingArea',
+  ClassRoom: 'classRoomArea',
 } as const;
 
 export const PauseAreaNames = [AreaName.Pause1, AreaName.Pause2] as const;
@@ -36,4 +38,5 @@ export const ActionVisibilityStateKey = {
   Greenhouse: 'actionVisibleGreenhouse',
   Lounge: 'actionVisibleLounge',
   Pool: 'actionVisiblePool',
+  ClassRoom: 'actionVisibleClassRoom',
 } as const;

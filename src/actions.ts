@@ -19,6 +19,7 @@ const actionVisibility = {
   [ActionButtonId.Greenhouse]: false,
   [ActionButtonId.Lounge]: false,
   [ActionButtonId.Pool]: false,
+  [ActionButtonId.ClassRoom]: false,
 };
 
 enum PositionType {
@@ -29,6 +30,7 @@ enum PositionType {
   LastPositionGreenhouse,
   LastPositionLounge,
   LastPositionPool,
+  LastPositionClassRoom,
 }
 
 interface Position {
@@ -44,6 +46,7 @@ const positions: Record<PositionType, Position> = {
   [PositionType.LastPositionGreenhouse]: {x: undefined, y: undefined},
   [PositionType.LastPositionLounge]: {x: undefined, y: undefined},
   [PositionType.LastPositionPool]: {x: undefined, y: undefined},
+  [PositionType.LastPositionClassRoom]: {x: undefined, y: undefined},
 };
 
 function clearLastPosition(positionType: PositionType) {
@@ -134,6 +137,12 @@ function loadActionSettingsFromState() {
   if (typeof savedPoolVisibility === 'boolean') {
     setActionVisibility(ActionButtonId.Pool, savedPoolVisibility);
   }
+
+  const savedClassRoomVisibility =
+      WA.player.state.loadVariable(ActionVisibilityStateKey.ClassRoom);
+  if (typeof savedClassRoomVisibility === 'boolean') {
+    setActionVisibility(ActionButtonId.ClassRoom, savedClassRoomVisibility);
+  }
 }
 
 function registerActionSettingsStateSync() {
@@ -167,6 +176,13 @@ function registerActionSettingsStateSync() {
       .subscribe((value) => {
         if (typeof value === 'boolean') {
           setActionVisibility(ActionButtonId.Meeting, value);
+        }
+      });
+
+  WA.player.state.onVariableChange(ActionVisibilityStateKey.ClassRoom)
+      .subscribe((value) => {
+        if (typeof value === 'boolean') {
+          setActionVisibility(ActionButtonId.ClassRoom, value);
         }
       });
 
@@ -230,6 +246,10 @@ function registerAreaOnLeaveHandler() {
 
   WA.room.area.onLeave(AreaName.Pool).subscribe(() => {
     clearLastPosition(PositionType.LastPositionPool);
+  });
+
+  WA.room.area.onLeave(AreaName.ClassRoom).subscribe(() => {
+    clearLastPosition(PositionType.LastPositionClassRoom);
   });
 }
 
@@ -355,6 +375,14 @@ function addActionButtons() {
         PositionType.LastPositionPool,
         async () => await WA.room.area.get(AreaName.Pool));
   }
+
+  if (actionVisibility[ActionButtonId.ClassRoom]) {
+    addTravelButton(
+        ActionButtonId.ClassRoom, assetUrl('ds/class.png'),
+        'Zum Klassenzimmer teleportieren und zurück',
+        PositionType.LastPositionClassRoom,
+        async () => await WA.room.area.get(AreaName.ClassRoom));
+  }
 }
 
 function removeActionButton(buttonId: string) {
@@ -369,6 +397,7 @@ function refreshActionButtons() {
   WA.ui.actionBar.removeButton(ActionButtonId.Greenhouse);
   WA.ui.actionBar.removeButton(ActionButtonId.Lounge);
   WA.ui.actionBar.removeButton(ActionButtonId.Pool);
+  WA.ui.actionBar.removeButton(ActionButtonId.ClassRoom);
   addActionButtons();
 }
 
