@@ -42,6 +42,7 @@ export default defineConfig({
   plugins: [...getMapsOptimizers(maps, optimizerOptions)],
   server: {
     host: 'localhost',
+    allowedHosts: ['.loca.lt'],
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
@@ -49,6 +50,6 @@ export default defineConfig({
           'X-Requested-With, content-type, Authorization',
       'Cache-Control': 'no-cache, no-store, must-revalidate',
     },
-    open: '/',
+    open: process.env.VITE_OPEN === 'false' ? false : '/',
   },
 });

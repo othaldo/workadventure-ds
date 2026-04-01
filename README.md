@@ -15,6 +15,23 @@ npm install
 npm run start
 ```
 
+## Dist And Tunnel Shortcuts
+
+You can now use these shortcuts for WorkAdventure publishing/testing workflows:
+
+```shell
+# Build once, then start static server + tunnel together
+npm run start:dist
+
+# Live mode: no rebuild needed after each change (auto update) + tunnel
+npm run start:live
+```
+
+If you use VS Code, open Run and Debug and select:
+
+- WA: Start Dist (Build + Tunnel)
+- WA: Start Live (Auto-Update + Tunnel)
+
 ## Licenses
 
 This project contains multiple licenses as follows:
