@@ -309,6 +309,7 @@ async function travelPlayerToArea(
     if (useTeleport) {
       await WA.player.teleport(x, y);
     } else {
+      WA.camera.followPlayer(true);
       let moveResult = await WA.player.moveTo(x, y, actionSettings.moveSpeed);
 
       // Fallback: if movement is interrupted, area leave events may not run as
