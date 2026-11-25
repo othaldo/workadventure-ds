@@ -308,6 +308,7 @@ async function travelPlayerToArea(
   if (x !== undefined && y !== undefined) {
     if (useTeleport) {
       await WA.player.teleport(x, y);
+      WA.camera.followPlayer(true);
     } else {
       WA.camera.followPlayer(true);
       let moveResult = await WA.player.moveTo(x, y, actionSettings.moveSpeed);
